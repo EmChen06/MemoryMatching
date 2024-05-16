@@ -7,10 +7,9 @@ import java.util.HashMap;
 import java.util.ArrayList;
 
 
-public class MemoryMatching extends JPanel implements ActionListener{
+public class MemoryMatching extends JFrame implements ActionListener{
 
-    JFrame f;
-    JPanel pSub, pError;
+    JPanel p, pSub, pError;
     JLabel title, prompt;
     JComboBox grid;
     HashMap<Integer, Integer> cards = new HashMap<Integer, Integer>();
@@ -27,16 +26,37 @@ public class MemoryMatching extends JPanel implements ActionListener{
     }
 
     public MemoryMatching() {
-        f = new JFrame("Memory Matching");
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        f.setLocationRelativeTo(null);
+        this.setTitle("Memory Matching");
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setLocationRelativeTo(null);
 
-        this.setPreferredSize(new Dimension(750, 500));
-        this.setLayout(new BorderLayout(10,10));
+        DrawingPanel panel = new DrawingPanel();
+        p = new JPanel();
+        p.setPreferredSize(new Dimension(750, 500));
+        p.setLayout(new BorderLayout(10,10));
+    
+        prompt = new JLabel("test");
+        prompt.setPreferredSize(new Dimension(100, 50));
+        prompt.setHorizontalAlignment(SwingConstants.CENTER);
+        p.add(prompt, BorderLayout.PAGE_START);
         
-        f.add(this);
-        f.pack();
-        f.setVisible(true);
+        this.add(p);
+        this.pack();
+        this.setVisible(true);
+    }
+
+    private class DrawingPanel extends JPanel {
+        DrawingPanel() {
+        }
+
+        @Override
+        public void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            Graphics2D g2 = (Graphics2D)g;
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        }
+    
+
     }
 
     public void generateCards() {
@@ -57,19 +77,10 @@ public class MemoryMatching extends JPanel implements ActionListener{
         }
     }
 
+
+
     @Override
     public void actionPerformed(ActionEvent e) {
-
-    }
-
-    @Override
-    public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        Graphics2D g2 = (Graphics2D)g;
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         
-        
-
     }
-
 }
