@@ -2,6 +2,8 @@ import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 import javax.swing.Timer.*;
+import java.util.Random;
+import java.util.HashMap;
 
 
 public class MemoryMatching implements ActionListener{
@@ -10,8 +12,7 @@ public class MemoryMatching implements ActionListener{
     JPanel p, pSub, pError;
     JLabel title, prompt;
     JComboBox grid;
-    JTextField g1, g2;
-
+    
     public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -32,7 +33,6 @@ public class MemoryMatching implements ActionListener{
         f.add(p);
         f.pack();
         f.setVisible(true);
-
     }
 
     @Override
