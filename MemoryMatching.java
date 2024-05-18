@@ -1,6 +1,9 @@
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
+import java.io.File;
 import javax.swing.Timer.*;
 import java.util.Random;
 import java.util.HashMap;
@@ -14,6 +17,8 @@ public class MemoryMatching extends JFrame implements ActionListener{
     JComboBox grid;
     HashMap<Integer, Integer> cards = new HashMap<Integer, Integer>();
     ArrayList<Integer> randomOrder = new ArrayList<Integer>();
+    //ArrayList<Card> drawingCards = new ArrayList<Card>(); 
+    BufferedImage img1, img2, img3, img4, img5, img6, img7, img8, img9, img10;
     Random rand = new Random();
     int nCards;
     
@@ -59,7 +64,7 @@ public class MemoryMatching extends JFrame implements ActionListener{
 
     }
 
-    public void generateCards() {
+    public void generateRandom() {
         int sum = 0;
         int n;
         for (int i = 1; i <= nCards; i++) {
@@ -77,7 +82,11 @@ public class MemoryMatching extends JFrame implements ActionListener{
         }
     }
 
-
+    public void createCards() {
+        for (Integer i: randomOrder) {
+            Card i = new Card(i, ("img" + String.valueOf(i)), false);
+        }
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
