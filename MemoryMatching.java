@@ -4,6 +4,7 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.io.File;
+import java.io.IOException;
 import javax.swing.Timer.*;
 import java.util.Random;
 import java.util.HashMap;
@@ -14,20 +15,56 @@ public class MemoryMatching extends JFrame implements ActionListener{
 
     JPanel p, pSub, pError;
     JLabel title, prompt;
-    JComboBox grid;
     HashMap<Integer, Integer> cards = new HashMap<Integer, Integer>();
     ArrayList<Integer> randomOrder = new ArrayList<Integer>();
-    //ArrayList<Card> drawingCards = new ArrayList<Card>(); 
-    BufferedImage img1, img2, img3, img4, img5, img6, img7, img8, img9, img10;
+    ArrayList<Card> drawingCards = new ArrayList<Card>(); 
+    BufferedImage[] images = new BufferedImage[10];
     Random rand = new Random();
     int nCards;
     
     public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                new MemoryMatching();
+                new Introduction();
             }
         });
+    }
+
+    static class Introduction extends JFrame {
+        public Introduction() {
+            this.setTitle("Memory Matching");
+            this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            this.setLocationRelativeTo(null);
+
+            ButtonGroup b = new ButtonGroup();
+            JPanel intro = new JPanel();
+            intro.setPreferredSize(new Dimension(750, 500));
+            
+            JRadioButton easy = new JRadioButton("2 x 5");
+            b.add(easy);
+            intro.add(easy);
+
+            JRadioButton medium = new JRadioButton("3 x 4");
+            b.add(medium);
+            intro.add(medium);
+
+            JRadioButton hard = new JRadioButton("4 x 4");
+            b.add(hard);
+            intro.add(hard);
+
+            JRadioButton hardest = new JRadioButton("4 x 5");
+            b.add(hardest);
+            intro.add(hard);
+            
+            this.add(intro);
+            this.pack();
+            this.setVisible(true);
+            
+            //add button to start (hide this and then create memory matching)
+
+            new MemoryMatching();
+
+        }
     }
 
     public MemoryMatching() {
@@ -35,23 +72,34 @@ public class MemoryMatching extends JFrame implements ActionListener{
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLocationRelativeTo(null);
 
-        DrawingPanel panel = new DrawingPanel();
+        JPanel grid = new JPanel();
         p = new JPanel();
-        p.setPreferredSize(new Dimension(750, 500));
-        p.setLayout(new BorderLayout(10,10));
+        p.setPreferredSize(new Dimension(1500, 750));
+        p.setLayout(new BorderLayout(5,10));
+        grid.setLayout(new GridLayout(2, 5));
     
-        prompt = new JLabel("test");
+        prompt = new JLabel("Find the Matching Pairs!");
+        prompt.setFont(new Font("Calibri", Font.BOLD, 20));
         prompt.setPreferredSize(new Dimension(100, 50));
         prompt.setHorizontalAlignment(SwingConstants.CENTER);
         p.add(prompt, BorderLayout.PAGE_START);
+
+        for (int i = 0; i < 10; i++) {
+            grid.add(new DrawingPanel(i));
+        }
+
+        p.add(grid, BorderLayout.CENTER);
         
         this.add(p);
         this.pack();
         this.setVisible(true);
+        addImages();
     }
 
-    private class DrawingPanel extends JPanel {
-        DrawingPanel() {
+    class DrawingPanel extends JPanel {
+        int n;
+        DrawingPanel(int draw) {
+            n = draw;
         }
 
         @Override
@@ -59,9 +107,8 @@ public class MemoryMatching extends JFrame implements ActionListener{
             super.paintComponent(g);
             Graphics2D g2 = (Graphics2D)g;
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.drawImage(images[n], 0,0,getWidth(), getHeight(),null);
         }
-    
-
     }
 
     public void generateRandom() {
@@ -82,9 +129,26 @@ public class MemoryMatching extends JFrame implements ActionListener{
         }
     }
 
-    public void createCards() {
+    public void addCard() {
         for (Integer i: randomOrder) {
-            Card i = new Card(i, ("img" + String.valueOf(i)), false);
+            drawingCards.add(new Card(i, images[i - 1], false));
+        }
+    }
+
+    static BufferedImage loadImage(String filename) {
+        BufferedImage img = null;
+        try {
+        img = ImageIO.read(new File(filename));
+        } catch (IOException e) {
+            System.out.println(e.toString());
+            JOptionPane.showMessageDialog(null, "An Image failed to load: " + filename, "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+        return img;
+    }
+
+    public void addImages() {
+        for (int i = 1; i < 11; i++) {
+            images[i - 1] = loadImage("img" + String.valueOf(i) + ".png");
         }
     }
 
