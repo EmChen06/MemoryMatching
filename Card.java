@@ -23,5 +23,9 @@ public class Card {
     private int getCardType() {
         return this.cardType;
     }
+
+    public BufferedImage getImage() {
+        return this.image;
+    }
     
 }

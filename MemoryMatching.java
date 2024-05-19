@@ -26,57 +26,97 @@ public class MemoryMatching extends JFrame implements ActionListener{
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 new Introduction();
+                // new MemoryMatching(new GridLayout(2,5));
             }
         });
     }
 
-    static class Introduction extends JFrame {
-        public Introduction() {
-            this.setTitle("Memory Matching");
-            this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            this.setLocationRelativeTo(null);
+    static class Introduction extends JFrame implements ActionListener{
 
-            ButtonGroup b = new ButtonGroup();
-            JPanel intro = new JPanel();
-            intro.setPreferredSize(new Dimension(750, 500));
+        boolean introVisible;
+        GridLayout gridFormat;
+        ButtonGroup b;
+        JPanel intro;
+
+        public Introduction() {
+            this.setTitle("Memory Matching Introduction");
+            this.setLocationRelativeTo(null);
+            this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+            b = new ButtonGroup();
+            intro = new JPanel();
+            intro.setPreferredSize(new Dimension(500, 250));
+            intro.setLayout(new BoxLayout(intro, BoxLayout.LINE_AXIS));
+            intro.add(Box.createRigidArea(new Dimension(125, 0)));
             
             JRadioButton easy = new JRadioButton("2 x 5");
+            easy.setActionCommand("easy");
+            easy.addActionListener(this);
             b.add(easy);
             intro.add(easy);
 
             JRadioButton medium = new JRadioButton("3 x 4");
+            medium.setActionCommand("medium");
+            medium.addActionListener(this);
             b.add(medium);
             intro.add(medium);
 
             JRadioButton hard = new JRadioButton("4 x 4");
+            hard.setActionCommand("hard");
+            hard.addActionListener(this);
             b.add(hard);
             intro.add(hard);
 
             JRadioButton hardest = new JRadioButton("4 x 5");
+            hardest.setActionCommand("hardest");
+            hardest.addActionListener(this);
             b.add(hardest);
-            intro.add(hard);
+            intro.add(hardest);
             
             this.add(intro);
             this.pack();
             this.setVisible(true);
             
-            //add button to start (hide this and then create memory matching)
+            JButton close = new JButton("Start");
+            close.setActionCommand("Start");
+            close.addActionListener(this);
+            intro.add(close);
 
-            new MemoryMatching();
+        }
 
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String event = e.getActionCommand();
+            if (event.equals("easy")) {
+                gridFormat = new GridLayout(2,5);
+            } else if (event.equals("medium")) {
+                gridFormat = new GridLayout(3, 4);
+            }else if (event.equals("hard")) {
+                gridFormat = new GridLayout(4,4);
+            } else if (event.equals("hardest")) {
+                gridFormat = new GridLayout(4,5);
+            } else if (event.equals("Start")) {
+                this.setVisible(introVisible);
+                new MemoryMatching(gridFormat);  
+            }
         }
     }
 
-    public MemoryMatching() {
+    public MemoryMatching(GridLayout grid) {
+
+        int x = grid.getColumns() * grid.getRows();
+        generateRandom(x);
+        addCard();
+
         this.setTitle("Memory Matching");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLocationRelativeTo(null);
 
-        JPanel grid = new JPanel();
+        JPanel gridPanel = new JPanel();
         p = new JPanel();
         p.setPreferredSize(new Dimension(1500, 750));
         p.setLayout(new BorderLayout(5,10));
-        grid.setLayout(new GridLayout(2, 5));
+        gridPanel.setLayout(grid);
     
         prompt = new JLabel("Find the Matching Pairs!");
         prompt.setFont(new Font("Calibri", Font.BOLD, 20));
@@ -84,11 +124,16 @@ public class MemoryMatching extends JFrame implements ActionListener{
         prompt.setHorizontalAlignment(SwingConstants.CENTER);
         p.add(prompt, BorderLayout.PAGE_START);
 
-        for (int i = 0; i < 10; i++) {
-            grid.add(new DrawingPanel(i));
+        //temp to get to draw everything
+        // for (int i = 0; i < 10; i++) {
+        //     gridPanel.add(new DrawingPanel(i));
+        // }
+
+        for (int i = 0; i < drawingCards.size(); i++) {
+            gridPanel.add(new DrawingPanel(i));
         }
 
-        p.add(grid, BorderLayout.CENTER);
+        p.add(gridPanel, BorderLayout.CENTER);
         
         this.add(p);
         this.pack();
@@ -107,13 +152,17 @@ public class MemoryMatching extends JFrame implements ActionListener{
             super.paintComponent(g);
             Graphics2D g2 = (Graphics2D)g;
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.drawImage(images[n], 0,0,getWidth(), getHeight(),null);
+            g2.drawImage((drawingCards.get(n)).getImage(), 0,0,getWidth(), getHeight(),null);
         }
     }
 
-    public void generateRandom() {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+
+    }
+
+    public void generateRandom(int n) {
         int sum = 0;
-        int n;
         for (int i = 1; i <= nCards; i++) {
             cards.put(i, 2);
             sum += 2;        
@@ -150,10 +199,5 @@ public class MemoryMatching extends JFrame implements ActionListener{
         for (int i = 1; i < 11; i++) {
             images[i - 1] = loadImage("img" + String.valueOf(i) + ".png");
         }
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        
     }
 }
