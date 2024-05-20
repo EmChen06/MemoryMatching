@@ -21,6 +21,7 @@ public class MemoryMatching extends JFrame implements ActionListener{
     BufferedImage[] images = new BufferedImage[10];
     Random rand = new Random();
     int nCards;
+    boolean match;
     
     public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -161,7 +162,9 @@ public class MemoryMatching extends JFrame implements ActionListener{
 
     }
 
-    public void generateRandom(int n) {
+    public void generateRandom(int x) {
+        nCards = x / 2;
+        int n;
         int sum = 0;
         for (int i = 1; i <= nCards; i++) {
             cards.put(i, 2);
@@ -200,4 +203,12 @@ public class MemoryMatching extends JFrame implements ActionListener{
             images[i - 1] = loadImage("img" + String.valueOf(i) + ".png");
         }
     }
+
+    public boolean checkMatch(Card c1, Card c2) {
+        if ((c1.getCardType()) == (c2.getCardType())) {
+            match = true;
+        } else match = false;
+        return match;
+    }
+
 }

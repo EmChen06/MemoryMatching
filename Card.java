@@ -20,7 +20,7 @@ public class Card {
         }
     }
     
-    private int getCardType() {
+    public int getCardType() {
         return this.cardType;
     }
 
