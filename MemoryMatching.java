@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.ArrayList;
 
 
-public class MemoryMatching extends JFrame implements ActionListener{
+public class MemoryMatching extends JFrame implements ActionListener, MouseListener {
 
     JPanel p, pSub, pError;
     JLabel title, prompt, count;
@@ -20,7 +20,7 @@ public class MemoryMatching extends JFrame implements ActionListener{
     ArrayList<Card> drawingCards = new ArrayList<Card>(); 
     BufferedImage[] images = new BufferedImage[10];
     Random rand = new Random();
-    int nCards;
+    int nCards, identify;
     boolean match;
     
     public static void main(String[] args) {
@@ -103,6 +103,7 @@ public class MemoryMatching extends JFrame implements ActionListener{
     }
 
     public MemoryMatching(GridLayout grid) {
+
         addImages();
         int x = grid.getColumns() * grid.getRows();
         generateRandom(x);
@@ -117,7 +118,9 @@ public class MemoryMatching extends JFrame implements ActionListener{
         p.setLayout(new BorderLayout(5,0));
         gridPanel.setLayout(grid);
         for (int i = 0; i < drawingCards.size(); i++) {
-            gridPanel.add(new DrawingPanel(i));            
+            identify = i;
+            gridPanel.add(new DrawingPanel(i));
+            this.addMouseListener(this);
         }
     
         prompt = new JLabel("Find the Matching Pairs!");
@@ -143,22 +146,6 @@ public class MemoryMatching extends JFrame implements ActionListener{
         this.pack();
         this.setLocationRelativeTo(null);
         this.setVisible(true);
-
-        // class FlipCard extends MouseAdapter {
-        //     public boolean backTrigger = true;
-        //     @Override
-        //     public void mouseClicked(MouseEvent e) {
-        //         if(e.getClickCount() > 0) {
-        //             if(backTrigger) {
-        //                 (drawingCards.get(n)).setFlipped(true);
-        //             } else {
-
-        //             }
-        //         }
-        //         backTrigger = !backTrigger;
-        //     }
-        // }
-
     }
 
     class DrawingPanel extends JPanel {
@@ -184,6 +171,33 @@ public class MemoryMatching extends JFrame implements ActionListener{
     public void actionPerformed(ActionEvent e) {
 
     }
+
+    @Override  
+    public void mouseClicked(MouseEvent e) {
+        boolean backTrigger = true;
+        if(e.getClickCount() > 0) {
+            if(backTrigger) {
+                System.out.println(10);
+                drawingCards.get(identify).setFlipped(true);
+            } else {
+
+            }
+        }
+        backTrigger = !backTrigger;
+
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {}
+
+    @Override
+    public void mouseReleased(MouseEvent e) {}
+
+    @Override
+    public void mouseEntered(MouseEvent e) {}
+
+    @Override
+    public void mouseExited(MouseEvent e) {}
 
     public void generateRandom(int x) {
         nCards = x / 2;
