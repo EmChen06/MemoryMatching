@@ -14,7 +14,7 @@ import java.util.ArrayList;
 public class MemoryMatching extends JFrame implements ActionListener{
 
     JPanel p, pSub, pError;
-    JLabel title, prompt;
+    JLabel title, prompt, count;
     HashMap<Integer, Integer> cards = new HashMap<Integer, Integer>();
     ArrayList<Integer> randomOrder = new ArrayList<Integer>();
     ArrayList<Card> drawingCards = new ArrayList<Card>(); 
@@ -27,12 +27,11 @@ public class MemoryMatching extends JFrame implements ActionListener{
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 new Introduction();
-                // new MemoryMatching(new GridLayout(2,5));
             }
         });
     }
 
-    static class Introduction extends JFrame implements ActionListener{
+    static class Introduction extends JFrame implements ActionListener {
 
         boolean introVisible;
         GridLayout gridFormat;
@@ -41,7 +40,6 @@ public class MemoryMatching extends JFrame implements ActionListener{
 
         public Introduction() {
             this.setTitle("Memory Matching Introduction");
-            this.setLocationRelativeTo(null);
             this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
             b = new ButtonGroup();
@@ -76,6 +74,7 @@ public class MemoryMatching extends JFrame implements ActionListener{
             
             this.add(intro);
             this.pack();
+            this.setLocationRelativeTo(null);
             this.setVisible(true);
             
             JButton close = new JButton("Start");
@@ -89,13 +88,13 @@ public class MemoryMatching extends JFrame implements ActionListener{
         public void actionPerformed(ActionEvent e) {
             String event = e.getActionCommand();
             if (event.equals("easy")) {
-                gridFormat = new GridLayout(2,5);
+                gridFormat = new GridLayout(2,5, 5, 5);
             } else if (event.equals("medium")) {
-                gridFormat = new GridLayout(3, 4);
+                gridFormat = new GridLayout(3, 4, 5, 5);
             }else if (event.equals("hard")) {
-                gridFormat = new GridLayout(4,4);
+                gridFormat = new GridLayout(4,4, 5, 5);
             } else if (event.equals("hardest")) {
-                gridFormat = new GridLayout(4,5);
+                gridFormat = new GridLayout(4,5, 5, 5);
             } else if (event.equals("Start")) {
                 this.setVisible(introVisible);
                 new MemoryMatching(gridFormat);  
@@ -104,20 +103,22 @@ public class MemoryMatching extends JFrame implements ActionListener{
     }
 
     public MemoryMatching(GridLayout grid) {
-
+        addImages();
         int x = grid.getColumns() * grid.getRows();
         generateRandom(x);
         addCard();
 
         this.setTitle("Memory Matching");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setLocationRelativeTo(null);
 
         JPanel gridPanel = new JPanel();
         p = new JPanel();
         p.setPreferredSize(new Dimension(1500, 750));
-        p.setLayout(new BorderLayout(5,10));
+        p.setLayout(new BorderLayout(5,0));
         gridPanel.setLayout(grid);
+        for (int i = 0; i < drawingCards.size(); i++) {
+            gridPanel.add(new DrawingPanel(i));            
+        }
     
         prompt = new JLabel("Find the Matching Pairs!");
         prompt.setFont(new Font("Calibri", Font.BOLD, 20));
@@ -125,21 +126,39 @@ public class MemoryMatching extends JFrame implements ActionListener{
         prompt.setHorizontalAlignment(SwingConstants.CENTER);
         p.add(prompt, BorderLayout.PAGE_START);
 
+        count = new JLabel("Matching Pairs Found: ");
+        count.setFont(new Font("Calibri", Font.BOLD, 20));
+        count.setPreferredSize(new Dimension(100, 50));
+        count.setHorizontalAlignment(SwingConstants.CENTER);
+        p.add(count, BorderLayout.PAGE_END);
+
         //temp to get to draw everything
         // for (int i = 0; i < 10; i++) {
         //     gridPanel.add(new DrawingPanel(i));
         // }
 
-        for (int i = 0; i < drawingCards.size(); i++) {
-            gridPanel.add(new DrawingPanel(i));
-        }
-
         p.add(gridPanel, BorderLayout.CENTER);
         
         this.add(p);
         this.pack();
+        this.setLocationRelativeTo(null);
         this.setVisible(true);
-        addImages();
+
+        // class FlipCard extends MouseAdapter {
+        //     public boolean backTrigger = true;
+        //     @Override
+        //     public void mouseClicked(MouseEvent e) {
+        //         if(e.getClickCount() > 0) {
+        //             if(backTrigger) {
+        //                 (drawingCards.get(n)).setFlipped(true);
+        //             } else {
+
+        //             }
+        //         }
+        //         backTrigger = !backTrigger;
+        //     }
+        // }
+
     }
 
     class DrawingPanel extends JPanel {
@@ -153,7 +172,11 @@ public class MemoryMatching extends JFrame implements ActionListener{
             super.paintComponent(g);
             Graphics2D g2 = (Graphics2D)g;
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.drawImage((drawingCards.get(n)).getImage(), 0,0,getWidth(), getHeight(),null);
+            if (drawingCards.get(n).getFlipped()) {
+                g2.drawImage((drawingCards.get(n)).getImage(), 0,0,getWidth(), getHeight(),null);
+            } else {
+                g2.fillRect(0,0,getWidth(), getHeight());
+            }
         }
     }
 
@@ -209,6 +232,15 @@ public class MemoryMatching extends JFrame implements ActionListener{
             match = true;
         } else match = false;
         return match;
+    }
+
+    public void yesMatch() {
+        
+    }
+
+    public void noMatch() {
+        //flipped = false
+        //say womp womp :(
     }
 
 }

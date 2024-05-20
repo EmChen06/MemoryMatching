@@ -12,12 +12,12 @@ public class Card {
         this.isFlipped = flipped;
     }
 
-    public boolean flip(Card c) {
-        if (this.cardType == c.getCardType()) {
-            return true;
-        } else {
-            return false;
-        }
+    public void setFlipped(boolean flip) {
+        this.isFlipped = flip;
+    }
+
+    public boolean getFlipped() {
+        return this.isFlipped;
     }
     
     public int getCardType() {
