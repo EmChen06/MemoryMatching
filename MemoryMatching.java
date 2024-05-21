@@ -6,10 +6,7 @@ import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
 import javax.swing.Timer.*;
-import java.util.Random;
-import java.util.HashMap;
-import java.util.ArrayList;
-
+import java.util.*;
 
 public class MemoryMatching extends JFrame implements ActionListener {
 
@@ -20,7 +17,10 @@ public class MemoryMatching extends JFrame implements ActionListener {
     ArrayList<Integer> randomOrder = new ArrayList<Integer>();
     ArrayList<Card> drawingCards = new ArrayList<Card>(); 
     BufferedImage[] images = new BufferedImage[10];
+    String[] tempImages = new String[10];
     Random rand = new Random();
+    Stack<Card> cardsFlipped = new Stack<Card>();
+    // Timer t;
     int nCards;
     final int max = 2;
     boolean match;
@@ -105,7 +105,6 @@ public class MemoryMatching extends JFrame implements ActionListener {
     }
 
     public MemoryMatching(GridLayout grid) {
-
         addImages();
         int x = grid.getColumns() * grid.getRows();
         generateRandom(x);
@@ -119,37 +118,42 @@ public class MemoryMatching extends JFrame implements ActionListener {
         p.setPreferredSize(new Dimension(1500, 750));
         p.setLayout(new BorderLayout(5,0));
         gridPanel.setLayout(grid);
+
         for (int i = 0; i < drawingCards.size(); i++) {
+            System.out.println(drawingCards.get(i).getCardType());
             checkFlipped.put(drawingCards.get(i), drawingCards.get(i).getFlipped());
             DrawingPanel panel = new DrawingPanel(i);
 
             panel.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    if (e.getClickCount() % 2 != 0) { //it will work if you click it quickly, but not when you add a delay between it
+                    if (e.getClickCount() > 0) { //it will work if you click it quickly, but not when you add a delay between it
                         (drawingCards.get(panel.getCardIndex())).setFlipped(true);
                         checkFlipped.put(drawingCards.get(panel.getCardIndex()), true);
                         panel.repaint();
 
-                        int totalFlipped = 0;
-                        Card[] cardsFlipped = new Card[2];
-
+                        // int totalFlipped = 0;
                         for (Card j: checkFlipped.keySet()) {
-                            if (String.valueOf(checkFlipped.get(j)).equals("true")) {
-                                cardsFlipped[totalFlipped] = j;
-                                totalFlipped++;
+                            if (j.getFlipped()) {
+                                // totalFlipped++;
+                                cardsFlipped.push(j);
+                                System.out.println(j);
+
+                                if (cardsFlipped.size() == max) { 
+                                    // (drawingCards.get(panel.getCardIndex())).setFlipped(false);
+                                    Card temp1 = cardsFlipped.pop();
+                                    Card temp2 = cardsFlipped.peek();
+                                    System.out.println(temp1);
+                                    System.out.println(temp2);
+                                    cardsFlipped.push(temp1);
+                                    checkMatch(temp1, temp2);
+                                    // (cardsFlipped.pop()).setFlipped(false);
+                                    // (cardsFlipped.pop()).setFlipped(false);
+                                    panel.repaint();
+                                }
                             }
                         }
 
-                        if (totalFlipped == max) { //shit dont work
-                            (drawingCards.get(panel.getCardIndex())).setFlipped(false);
-                            checkMatch(cardsFlipped[0], cardsFlipped[1]);
-                            panel.repaint();
-                        }
-
-                    } else if (e.getClickCount() % 2 == 0) { //TODO: fix if cicked TWICE, it will set as false
-                        (drawingCards.get(panel.getCardIndex())).setFlipped(false);
-                        panel.repaint();
                     }
                 }
             });
@@ -229,7 +233,7 @@ public class MemoryMatching extends JFrame implements ActionListener {
 
     public void addCard() {
         for (Integer i: randomOrder) {
-            drawingCards.add(new Card(i, images[i - 1], false));
+            drawingCards.add(new Card(i, images[i - 1], false, tempImages[i-1]));
         }
     }
 
@@ -247,21 +251,28 @@ public class MemoryMatching extends JFrame implements ActionListener {
     public void addImages() {
         for (int i = 1; i < 11; i++) {
             images[i - 1] = loadImage("img" + String.valueOf(i) + ".png");
+            tempImages[i - 1] = "img" + String.valueOf(i) + ".png";
         }
     }
 
     public void checkMatch(Card c1, Card c2) {
+        System.out.println(c1.getCardType() + c1.getImageName());
+        System.out.println(c2.getCardType() + c2.getImageName());
         if ((c1.getCardType()) == (c2.getCardType())) yesMatch();
         else noMatch(c1, c2);
     }
 
     public void yesMatch() {
         System.out.println("yay!");
+        cardsFlipped.clear();
+        // cardsFlipped.pop();
+        // cardsFlipped.pop();
     }
 
     public void noMatch(Card c1, Card c2) {
         System.out.println("womp womp");
-        //flipped = false
+        // (cardsFlipped.pop()).setFlipped(false);
+        // (cardsFlipped.pop()).setFlipped(false);
         //say womp womp :(
     }
 
