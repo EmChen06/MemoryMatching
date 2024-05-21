@@ -1,29 +1,26 @@
 import java.awt.*;
 import javax.swing.*;
+import javax.swing.Timer;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
-import javax.swing.Timer.*;
 import java.util.*;
 
 public class MemoryMatching extends JFrame implements ActionListener {
 
-    JPanel p, pSub, pError;
+    JPanel p;
     JLabel title, prompt, count;
     HashMap<Integer, Integer> cards = new HashMap<Integer, Integer>();
-    HashMap<Card, Boolean> checkFlipped = new HashMap<Card, Boolean>();
     ArrayList<Integer> randomOrder = new ArrayList<Integer>();
     ArrayList<Card> drawingCards = new ArrayList<Card>(); 
     BufferedImage[] images = new BufferedImage[10];
-    String[] tempImages = new String[10];
     Random rand = new Random();
     Stack<Card> cardsFlipped = new Stack<Card>();
-    // Timer t;
-    int nCards;
+    Timer t;
+    int nCards, matched = 0;
     final int max = 2;
-    boolean match;
     
     public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -121,7 +118,6 @@ public class MemoryMatching extends JFrame implements ActionListener {
 
         for (int i = 0; i < drawingCards.size(); i++) {
             System.out.println(drawingCards.get(i).getCardType());
-            checkFlipped.put(drawingCards.get(i), drawingCards.get(i).getFlipped());
             DrawingPanel panel = new DrawingPanel(i);
 
             panel.addMouseListener(new MouseAdapter() {
@@ -129,31 +125,27 @@ public class MemoryMatching extends JFrame implements ActionListener {
                 public void mouseClicked(MouseEvent e) {
                     if (e.getClickCount() > 0) { //it will work if you click it quickly, but not when you add a delay between it
                         (drawingCards.get(panel.getCardIndex())).setFlipped(true);
-                        checkFlipped.put(drawingCards.get(panel.getCardIndex()), true);
                         panel.repaint();
 
-                        // int totalFlipped = 0;
-                        for (Card j: checkFlipped.keySet()) {
-                            if (j.getFlipped()) {
-                                // totalFlipped++;
-                                cardsFlipped.push(j);
-                                System.out.println(j);
+                        for (int j = 0; j < drawingCards.size(); j++) {
+                            if (drawingCards.get(j).getFlipped() && !drawingCards.get(j).getMatched()) {
+                                if ((cardsFlipped.size() == 0) || (cardsFlipped.size() > 0 && drawingCards.get(j) != cardsFlipped.peek())) {
+                                    cardsFlipped.push(drawingCards.get(j));
+                                }
 
                                 if (cardsFlipped.size() == max) { 
-                                    // (drawingCards.get(panel.getCardIndex())).setFlipped(false);
                                     Card temp1 = cardsFlipped.pop();
                                     Card temp2 = cardsFlipped.peek();
                                     System.out.println(temp1);
                                     System.out.println(temp2);
                                     cardsFlipped.push(temp1);
                                     checkMatch(temp1, temp2);
-                                    // (cardsFlipped.pop()).setFlipped(false);
-                                    // (cardsFlipped.pop()).setFlipped(false);
+                                    cardsFlipped.clear();
                                     panel.repaint();
+                                    break;
                                 }
-                            }
+                            } else continue;
                         }
-
                     }
                 }
             });
@@ -168,7 +160,7 @@ public class MemoryMatching extends JFrame implements ActionListener {
         prompt.setHorizontalAlignment(SwingConstants.CENTER);
         p.add(prompt, BorderLayout.PAGE_START);
 
-        count = new JLabel("Matching Pairs Found: ");
+        count = new JLabel("Matching Pairs Found: " + matched);
         count.setFont(new Font("Calibri", Font.BOLD, 20));
         count.setPreferredSize(new Dimension(100, 50));
         count.setHorizontalAlignment(SwingConstants.CENTER);
@@ -202,8 +194,6 @@ public class MemoryMatching extends JFrame implements ActionListener {
             } else {
                 g2.fillRect(0,0,getWidth(), getHeight());
             }
-            //here to make me feel better about myself
-            // g2.drawImage((drawingCards.get(n)).getImage(), 0,0,getWidth(), getHeight(),null);
         }
     }
 
@@ -233,7 +223,7 @@ public class MemoryMatching extends JFrame implements ActionListener {
 
     public void addCard() {
         for (Integer i: randomOrder) {
-            drawingCards.add(new Card(i, images[i - 1], false, tempImages[i-1]));
+            drawingCards.add(new Card(i, images[i - 1], false, false));
         }
     }
 
@@ -251,28 +241,34 @@ public class MemoryMatching extends JFrame implements ActionListener {
     public void addImages() {
         for (int i = 1; i < 11; i++) {
             images[i - 1] = loadImage("img" + String.valueOf(i) + ".png");
-            tempImages[i - 1] = "img" + String.valueOf(i) + ".png";
         }
     }
 
     public void checkMatch(Card c1, Card c2) {
-        System.out.println(c1.getCardType() + c1.getImageName());
-        System.out.println(c2.getCardType() + c2.getImageName());
-        if ((c1.getCardType()) == (c2.getCardType())) yesMatch();
+        if ((c1.getCardType()) == (c2.getCardType())) yesMatch(c1, c2);
         else noMatch(c1, c2);
     }
 
-    public void yesMatch() {
+    public void yesMatch(Card c1, Card c2) {
         System.out.println("yay!");
-        cardsFlipped.clear();
-        // cardsFlipped.pop();
-        // cardsFlipped.pop();
+        matched++;
+        count.setText("Matching Pairs Found: " + matched);
+        c1.setMatched(true);
+        c2.setMatched(true);
     }
 
     public void noMatch(Card c1, Card c2) {
         System.out.println("womp womp");
-        // (cardsFlipped.pop()).setFlipped(false);
-        // (cardsFlipped.pop()).setFlipped(false);
+        t = new Timer(1500, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                c1.setFlipped(false);
+                c2.setFlipped(false);
+                repaint();
+            }
+        });
+        t.setRepeats(false);
+        t.start();
         //say womp womp :(
     }
 

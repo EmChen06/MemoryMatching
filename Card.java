@@ -2,20 +2,24 @@ import java.awt.image.BufferedImage;
 
 public class Card {
 
-    int cardType;
-    BufferedImage image;
-    boolean isFlipped;
-    String imgName;
+    private int cardType;
+    private BufferedImage image;
+    private boolean isFlipped;
+    private boolean isMatched;
 
-    Card(int cT, BufferedImage img, boolean flipped, String iName) {
+    Card(int cT, BufferedImage img, boolean flipped, boolean matched) {
         this.cardType = cT;
         this.image = img;
         this.isFlipped = flipped;
-        this.imgName = iName;
+        this.isMatched = matched;
     }
 
-    public String getImageName() {
-        return this.imgName;
+    public void setMatched(boolean matched) {
+        this.isMatched = matched;
+    }
+
+    public boolean getMatched() {
+        return this.isMatched;
     }
 
     public void setFlipped(boolean flip) {
