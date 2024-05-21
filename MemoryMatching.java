@@ -20,7 +20,7 @@ public class MemoryMatching extends JFrame implements ActionListener, MouseListe
     ArrayList<Card> drawingCards = new ArrayList<Card>(); 
     BufferedImage[] images = new BufferedImage[10];
     Random rand = new Random();
-    int nCards, identify;
+    int nCards, identify, max;
     boolean match;
     
     public static void main(String[] args) {
@@ -164,6 +164,8 @@ public class MemoryMatching extends JFrame implements ActionListener, MouseListe
             } else {
                 g2.fillRect(0,0,getWidth(), getHeight());
             }
+            //here to make me feel better about myself
+            // g2.drawImage((drawingCards.get(n)).getImage(), 0,0,getWidth(), getHeight(),null);
         }
     }
 
@@ -177,10 +179,7 @@ public class MemoryMatching extends JFrame implements ActionListener, MouseListe
         boolean backTrigger = true;
         if(e.getClickCount() > 0) {
             if(backTrigger) {
-                System.out.println(10);
-                drawingCards.get(identify).setFlipped(true);
-            } else {
-
+                (drawingCards.get(identify)).setFlipped(true);
             }
         }
         backTrigger = !backTrigger;
