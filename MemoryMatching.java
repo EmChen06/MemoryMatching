@@ -11,16 +11,18 @@ import java.util.HashMap;
 import java.util.ArrayList;
 
 
-public class MemoryMatching extends JFrame implements ActionListener, MouseListener {
+public class MemoryMatching extends JFrame implements ActionListener {
 
     JPanel p, pSub, pError;
     JLabel title, prompt, count;
     HashMap<Integer, Integer> cards = new HashMap<Integer, Integer>();
+    HashMap<Card, Boolean> checkFlipped = new HashMap<Card, Boolean>();
     ArrayList<Integer> randomOrder = new ArrayList<Integer>();
     ArrayList<Card> drawingCards = new ArrayList<Card>(); 
     BufferedImage[] images = new BufferedImage[10];
     Random rand = new Random();
-    int nCards, identify, max;
+    int nCards;
+    final int max = 2;
     boolean match;
     
     public static void main(String[] args) {
@@ -118,9 +120,42 @@ public class MemoryMatching extends JFrame implements ActionListener, MouseListe
         p.setLayout(new BorderLayout(5,0));
         gridPanel.setLayout(grid);
         for (int i = 0; i < drawingCards.size(); i++) {
-            identify = i;
-            gridPanel.add(new DrawingPanel(i));
-            this.addMouseListener(this);
+            checkFlipped.put(drawingCards.get(i), drawingCards.get(i).getFlipped());
+            DrawingPanel panel = new DrawingPanel(i);
+
+            panel.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (e.getClickCount() % 2 != 0) { //it will work if you click it quickly, but not when you add a delay between it
+                        (drawingCards.get(panel.getCardIndex())).setFlipped(true);
+                        checkFlipped.put(drawingCards.get(panel.getCardIndex()), true);
+                        panel.repaint();
+
+                        int totalFlipped = 0;
+                        Card[] cardsFlipped = new Card[2];
+
+                        for (Card j: checkFlipped.keySet()) {
+                            if (String.valueOf(checkFlipped.get(j)).equals("true")) {
+                                cardsFlipped[totalFlipped] = j;
+                                totalFlipped++;
+                            }
+                        }
+
+                        if (totalFlipped == max) { //shit dont work
+                            (drawingCards.get(panel.getCardIndex())).setFlipped(false);
+                            checkMatch(cardsFlipped[0], cardsFlipped[1]);
+                            panel.repaint();
+                        }
+
+                    } else if (e.getClickCount() % 2 == 0) { //TODO: fix if cicked TWICE, it will set as false
+                        (drawingCards.get(panel.getCardIndex())).setFlipped(false);
+                        panel.repaint();
+                    }
+                }
+            });
+
+            gridPanel.add(panel);
+
         }
     
         prompt = new JLabel("Find the Matching Pairs!");
@@ -135,11 +170,6 @@ public class MemoryMatching extends JFrame implements ActionListener, MouseListe
         count.setHorizontalAlignment(SwingConstants.CENTER);
         p.add(count, BorderLayout.PAGE_END);
 
-        //temp to get to draw everything
-        // for (int i = 0; i < 10; i++) {
-        //     gridPanel.add(new DrawingPanel(i));
-        // }
-
         p.add(gridPanel, BorderLayout.CENTER);
         
         this.add(p);
@@ -152,6 +182,10 @@ public class MemoryMatching extends JFrame implements ActionListener, MouseListe
         int n;
         DrawingPanel(int draw) {
             n = draw;
+        }
+
+        public int getCardIndex() {
+            return n;
         }
 
         @Override
@@ -173,30 +207,6 @@ public class MemoryMatching extends JFrame implements ActionListener, MouseListe
     public void actionPerformed(ActionEvent e) {
 
     }
-
-    @Override  
-    public void mouseClicked(MouseEvent e) {
-        boolean backTrigger = true;
-        if(e.getClickCount() > 0) {
-            if(backTrigger) {
-                (drawingCards.get(identify)).setFlipped(true);
-            }
-        }
-        backTrigger = !backTrigger;
-
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {}
-
-    @Override
-    public void mouseReleased(MouseEvent e) {}
-
-    @Override
-    public void mouseEntered(MouseEvent e) {}
-
-    @Override
-    public void mouseExited(MouseEvent e) {}
 
     public void generateRandom(int x) {
         nCards = x / 2;
@@ -240,18 +250,17 @@ public class MemoryMatching extends JFrame implements ActionListener, MouseListe
         }
     }
 
-    public boolean checkMatch(Card c1, Card c2) {
-        if ((c1.getCardType()) == (c2.getCardType())) {
-            match = true;
-        } else match = false;
-        return match;
+    public void checkMatch(Card c1, Card c2) {
+        if ((c1.getCardType()) == (c2.getCardType())) yesMatch();
+        else noMatch(c1, c2);
     }
 
     public void yesMatch() {
-        
+        System.out.println("yay!");
     }
 
-    public void noMatch() {
+    public void noMatch(Card c1, Card c2) {
+        System.out.println("womp womp");
         //flipped = false
         //say womp womp :(
     }
