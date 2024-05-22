@@ -9,20 +9,27 @@ import java.io.IOException;
 import java.util.*;
 import java.lang.Math;
 
+/**
+ * MemoryMatching.java
+ * May 22nd, 2024
+ * Emilee Chen
+ * A game where users flip 2 cards at a time and tries to match the images together. The user can also choose the level of difficulty with a JRadioButton.
+ */
+
 public class MemoryMatching extends JFrame implements ActionListener {
 
     JPanel p;
     JLabel title, prompt, count;
-    HashMap<Integer, Integer> cards = new HashMap<Integer, Integer>();
-    ArrayList<Integer> randomOrder = new ArrayList<Integer>();
-    ArrayList<Card> drawingCards = new ArrayList<Card>(); 
-    ArrayList<Confetti> confetti = new ArrayList<Confetti>();
-    BufferedImage[] images = new BufferedImage[10];
+    HashMap<Integer, Integer> cards = new HashMap<Integer, Integer>(); //To generate a random order for cards
+    ArrayList<Integer> randomOrder = new ArrayList<Integer>(); //The random card order
+    ArrayList<Card> drawingCards = new ArrayList<Card>(); //Stores the Card objects
+    ArrayList<Confetti> confetti = new ArrayList<Confetti>(); //Stores the Confetti objects
+    BufferedImage[] images = new BufferedImage[10]; //Stores the images
     Random rand = new Random();
-    Stack<Card> cardsFlipped = new Stack<Card>();
+    Stack<Card> cardsFlipped = new Stack<Card>(); //Tracks the cards flipped
     Timer t, tWin;
     int nCards, matched = 0;
-    final int max = 2;
+    final int max = 2; //MAX amount of cards that can be flipped
     
     public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -32,6 +39,7 @@ public class MemoryMatching extends JFrame implements ActionListener {
         });
     }
 
+    //Introduction frame that allows user to choose the grid
     static class Introduction extends JFrame implements ActionListener {
 
         boolean introVisible;
@@ -49,6 +57,8 @@ public class MemoryMatching extends JFrame implements ActionListener {
             intro.setLayout(new BoxLayout(intro, BoxLayout.LINE_AXIS));
             intro.add(Box.createRigidArea(new Dimension(125, 0)));
             
+            //Adding options for the grid
+
             JRadioButton easy = new JRadioButton("2 x 5");
             easy.setActionCommand("easy");
             easy.addActionListener(this);
@@ -78,6 +88,7 @@ public class MemoryMatching extends JFrame implements ActionListener {
             this.setLocationRelativeTo(null);
             this.setVisible(true);
             
+            //The button will start the game
             JButton close = new JButton("Start");
             close.setActionCommand("Start");
             close.addActionListener(this);
@@ -86,6 +97,7 @@ public class MemoryMatching extends JFrame implements ActionListener {
         }
 
         @Override
+         //Listeners for the grid chosen and if the user started the game
         public void actionPerformed(ActionEvent e) {
             String event = e.getActionCommand();
             if (event.equals("easy")) {
@@ -98,20 +110,24 @@ public class MemoryMatching extends JFrame implements ActionListener {
                 gridFormat = new GridLayout(4,5, 5, 5);
             } else if (event.equals("Start")) {
                 this.setVisible(introVisible);
-                new MemoryMatching(gridFormat);  
+                new MemoryMatching(gridFormat);  //Changes to new JFrame
             }
         }
     }
 
+    //Main game frame
     public MemoryMatching(GridLayout grid) {
-        addImages();
+        addImages(); //imports all the images
+        
+        //Gets the total number of cards
         int x = grid.getColumns() * grid.getRows();
-        generateRandom(x);
-        addCard();
+        generateRandom(x); //Generates a random order for the cards
+        addCard(); //Creates and adds cards to an array
 
         this.setTitle("Memory Matching");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+        //Creating a gridPanel to add the cards to
         JPanel gridPanel = new JPanel();
         p = new JPanel();
         p.setPreferredSize(new Dimension(1500, 750));
@@ -119,28 +135,27 @@ public class MemoryMatching extends JFrame implements ActionListener {
         gridPanel.setLayout(grid);
 
         for (int i = 0; i < drawingCards.size(); i++) {
-            System.out.println(drawingCards.get(i).getCardType());
-            DrawingPanel panel = new DrawingPanel(i);
+            DrawingPanel panel = new DrawingPanel(i); //Creating a drawing panel for each grid
 
             panel.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    if (e.getClickCount() > 0) { //it will work if you click it quickly, but not when you add a delay between it
-                        (drawingCards.get(panel.getCardIndex())).setFlipped(true);
+                    if (e.getClickCount() > 0) { 
+                        (drawingCards.get(panel.getCardIndex())).setFlipped(true); //if the grid is clicked, the card will be flipped
                         panel.repaint();
 
                         for (int j = 0; j < drawingCards.size(); j++) {
                             if (drawingCards.get(j).getFlipped() && !drawingCards.get(j).getMatched()) {
                                 if ((cardsFlipped.size() == 0) || (cardsFlipped.size() > 0 && drawingCards.get(j) != cardsFlipped.peek())) {
-                                    cardsFlipped.push(drawingCards.get(j));
+                                    cardsFlipped.push(drawingCards.get(j)); //Will add the flipped cards to a Stack
                                 }
 
-                                if (cardsFlipped.size() == max) { 
+                                if (cardsFlipped.size() == max) { //Ensures only 2 cards are flipped at a time
+                                    //Returning the two cards in the stack
                                     Card temp1 = cardsFlipped.pop();
                                     Card temp2 = cardsFlipped.peek();
-                                    System.out.println(temp1);
-                                    System.out.println(temp2);
                                     cardsFlipped.push(temp1);
+                            
                                     checkMatch(temp1, temp2);
                                     cardsFlipped.clear();
                                     panel.repaint();
@@ -163,6 +178,7 @@ public class MemoryMatching extends JFrame implements ActionListener {
         prompt.setHorizontalAlignment(SwingConstants.CENTER);
         p.add(prompt, BorderLayout.PAGE_START);
 
+        //Counts the matching pairs found
         count = new JLabel("Matching Pairs Found: " + matched);
         count.setFont(new Font("Calibri", Font.BOLD, 20));
         count.setPreferredSize(new Dimension(100, 50));
@@ -180,7 +196,7 @@ public class MemoryMatching extends JFrame implements ActionListener {
     class DrawingPanel extends JPanel {
         int n;
         DrawingPanel(int draw) {
-            n = draw;
+            n = draw; //Sets the index of the card that needs to be drawn
         }
 
         public int getCardIndex() {
@@ -192,11 +208,15 @@ public class MemoryMatching extends JFrame implements ActionListener {
             super.paintComponent(g);
             Graphics2D g2 = (Graphics2D)g;
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            //If the card is flipped, then it will draw the image, else it will draw a blank rectangle
             if (drawingCards.get(n).getFlipped()) {
                 g2.drawImage((drawingCards.get(n)).getImage(), 0,0,getWidth(), getHeight(),null);
             } else {
                 g2.fillRect(0,0,getWidth(), getHeight());
             }
+
+            //Draws the confetti
             for (Confetti c: confetti) {
                 g2.setColor(c.c);
                 g2.fillOval(c.x, c.y, c.r, c.r);
@@ -207,15 +227,22 @@ public class MemoryMatching extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {}
 
+    /**
+     * Creates a random order for the cards by creating a hatchmap with the cardType (as the key) and the AMOUNT of cards (2, as the value)
+     * @param x Total cards in the grid
+     */
     public void generateRandom(int x) {
         nCards = x / 2;
         int n;
         int sum = 0;
+
+        //Generates hashmap
         for (int i = 1; i <= nCards; i++) {
             cards.put(i, 2);
             sum += 2;        
         }
 
+        //If the value isnt 0, it will add the key to a random order arrayList
         while (sum != 0) {
             n = rand.nextInt(nCards) + 1;
             if ((cards.get(n) - 1) >= 0) {
@@ -226,36 +253,55 @@ public class MemoryMatching extends JFrame implements ActionListener {
         }
     }
 
+    /**
+     * Creates and adds cards to an arrayList (in the random order generated)
+     */
     public void addCard() {
         for (Integer i: randomOrder) {
             drawingCards.add(new Card(i, images[i - 1], false, false));
         }
     }
 
+    /**
+     * Generates images into the file
+     * @param filename the image name
+     * @return  Returns the BufferedImage
+     */
     static BufferedImage loadImage(String filename) {
         BufferedImage img = null;
         try {
         img = ImageIO.read(new File(filename));
         } catch (IOException e) {
-            System.out.println(e.toString());
             JOptionPane.showMessageDialog(null, "An Image failed to load: " + filename, "ERROR", JOptionPane.ERROR_MESSAGE);
         }
         return img;
     }
 
+    /**
+     * Adds images to an array based on the name
+     */
     public void addImages() {
         for (int i = 1; i < 11; i++) {
             images[i - 1] = loadImage("img" + String.valueOf(i) + ".png");
         }
     }
 
+    /**
+     * Checks if the two cards flipped over are a match
+     * @param c1    First card flipped over
+     * @param c2    Second card flipped over
+     */
     public void checkMatch(Card c1, Card c2) {
         if ((c1.getCardType()) == (c2.getCardType())) yesMatch(c1, c2);
         else noMatch(c1, c2);
     }
 
+    /**
+     * If the cards are a match, they will stay flipped over and check for a win
+     * @param c1    First card flipped over
+     * @param c2    Second card flipped over
+     */
     public void yesMatch(Card c1, Card c2) {
-        System.out.println("yay!");
         matched++;
         count.setText("Matching Pairs Found: " + matched);
         c1.setMatched(true);
@@ -263,8 +309,12 @@ public class MemoryMatching extends JFrame implements ActionListener {
         if (matched == (drawingCards.size() / 2)) win();
     }
 
+    /**
+     * If the cards are not a match, it will wait 1.5 seconds then flip over automatically
+     * @param c1    First card flipped over
+     * @param c2    Second card flipped over
+     */
     public void noMatch(Card c1, Card c2) {
-        System.out.println("womp womp");
         t = new Timer(1500, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -277,6 +327,9 @@ public class MemoryMatching extends JFrame implements ActionListener {
         t.start();
     }
 
+    /**
+     * If the player matched all the cards, confetti will appear on each grid panel
+     */
     public void win() {
         tWin = new Timer(30, new ActionListener() {
             @Override
