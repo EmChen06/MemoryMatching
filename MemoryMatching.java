@@ -7,6 +7,7 @@ import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.lang.Math;
 
 public class MemoryMatching extends JFrame implements ActionListener {
 
@@ -15,10 +16,11 @@ public class MemoryMatching extends JFrame implements ActionListener {
     HashMap<Integer, Integer> cards = new HashMap<Integer, Integer>();
     ArrayList<Integer> randomOrder = new ArrayList<Integer>();
     ArrayList<Card> drawingCards = new ArrayList<Card>(); 
+    ArrayList<Confetti> confetti = new ArrayList<Confetti>();
     BufferedImage[] images = new BufferedImage[10];
     Random rand = new Random();
     Stack<Card> cardsFlipped = new Stack<Card>();
-    Timer t;
+    Timer t, tWin;
     int nCards, matched = 0;
     final int max = 2;
     
@@ -144,6 +146,7 @@ public class MemoryMatching extends JFrame implements ActionListener {
                                     panel.repaint();
                                     break;
                                 }
+
                             } else continue;
                         }
                     }
@@ -193,6 +196,10 @@ public class MemoryMatching extends JFrame implements ActionListener {
                 g2.drawImage((drawingCards.get(n)).getImage(), 0,0,getWidth(), getHeight(),null);
             } else {
                 g2.fillRect(0,0,getWidth(), getHeight());
+            }
+            for (Confetti c: confetti) {
+                g2.setColor(c.c);
+                g2.fillOval(c.x, c.y, c.r, c.r);
             }
         }
     }
@@ -255,6 +262,7 @@ public class MemoryMatching extends JFrame implements ActionListener {
         count.setText("Matching Pairs Found: " + matched);
         c1.setMatched(true);
         c2.setMatched(true);
+        if (matched == (drawingCards.size() / 2)) win();
     }
 
     public void noMatch(Card c1, Card c2) {
@@ -269,7 +277,22 @@ public class MemoryMatching extends JFrame implements ActionListener {
         });
         t.setRepeats(false);
         t.start();
-        //say womp womp :(
     }
 
+    public void win() {
+        tWin = new Timer(30, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (Math.random()*100 > 70) confetti.add(new Confetti());
+                for (int i = 0; i < confetti.size(); i++) {
+                    confetti.get(i).move();
+                    if (confetti.get(i).y > getHeight()) {
+                        confetti.remove(confetti.get(i));
+                    }
+                }
+                repaint();
+            }
+        });
+        tWin.start();
+    }
 }
