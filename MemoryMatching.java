@@ -205,9 +205,7 @@ public class MemoryMatching extends JFrame implements ActionListener {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-
-    }
+    public void actionPerformed(ActionEvent e) {}
 
     public void generateRandom(int x) {
         nCards = x / 2;
@@ -283,7 +281,7 @@ public class MemoryMatching extends JFrame implements ActionListener {
         tWin = new Timer(30, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (Math.random()*100 > 70) confetti.add(new Confetti());
+                if (Math.random()*100 > 65) confetti.add(new Confetti()); //35% chance
                 for (int i = 0; i < confetti.size(); i++) {
                     confetti.get(i).move();
                     if (confetti.get(i).y > getHeight()) {
